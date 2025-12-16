@@ -1,0 +1,63 @@
+/auth/google:
+  post:
+    summary: Login with Google
+    tags:
+      - Auth
+    description: Login a user via Google OAuth2. Expects a valid Google ID token.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - idToken
+            properties:
+              idToken:
+                type: string
+                description: Google ID token
+                example: 'eyJhbGciOiJSUzI1NiIsImtpZCI6IkpXVCJ9...'
+    responses:
+      200:
+        description: Successful Google login
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                accessToken:
+                  type: string
+                  description: JWT access token
+                  example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+                refreshToken:
+                  type: string
+                  description: JWT refresh token
+                  example: 'dGhpc2lzYXJlZnJlc2h0b2tlbg=='
+                user:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      example: '64a0c6c3f0d8b50012abcd34'
+                    email:
+                      type: string
+                      example: 'google@gmail.com'
+                    firstName:
+                      type: string
+                      example: 'Google'
+                    lastName:
+                      type: string
+                      example: 'User'
+                    role:
+                      type: string
+                      example: 'student'
+      401:
+        description: Invalid Google token
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: 'INVALID_GOOGLE_TOKEN'

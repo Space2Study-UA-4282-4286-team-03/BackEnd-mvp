@@ -31,5 +31,6 @@ router.patch(
   langMiddleware,
   asyncWrapper(authController.updatePassword)
 )
+router.post('/google', langMiddleware, asyncWrapper(authController.googleAuth))
 
 module.exports = router
