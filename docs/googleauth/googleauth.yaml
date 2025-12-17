@@ -3,7 +3,7 @@
     summary: Login with Google
     tags:
       - Auth
-    description: Login a user via Google OAuth2. Expects a valid Google ID token.
+    description: Login a user via Google OAuth2.
     requestBody:
       required: true
       content:
@@ -16,10 +16,17 @@
               idToken:
                 type: string
                 description: Google ID token
-                example: 'eyJhbGciOiJSUzI1NiIsImtpZCI6IkpXVCJ9...'
+              language:
+                type: string
+                example: 'uk'
     responses:
       200:
         description: Successful Google login
+        headers:
+          Set-Cookie:
+            description: Access and refresh tokens are set in httpOnly cookies
+            schema:
+              type: string
         content:
           application/json:
             schema:
@@ -27,30 +34,6 @@
               properties:
                 accessToken:
                   type: string
-                  description: JWT access token
-                  example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
-                refreshToken:
-                  type: string
-                  description: JWT refresh token
-                  example: 'dGhpc2lzYXJlZnJlc2h0b2tlbg=='
-                user:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                      example: '64a0c6c3f0d8b50012abcd34'
-                    email:
-                      type: string
-                      example: 'google@gmail.com'
-                    firstName:
-                      type: string
-                      example: 'Google'
-                    lastName:
-                      type: string
-                      example: 'User'
-                    role:
-                      type: string
-                      example: 'student'
       401:
         description: Invalid Google token
         content:
