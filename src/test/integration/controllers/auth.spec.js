@@ -115,6 +115,24 @@ describe('Auth controller', () => {
     })
   })
 
+  describe('Login endpoint', () => {
+    it('should throw INCORRECT_CREDENTIALS for wrong password', async () => {
+      const email = `wrongpass${Date.now()}@test.com` // унікальний email
+      await app.post('/auth/signup').send({ ...user, email, isEmailConfirmed: true })
+
+      const response = await app.post('/auth/login').send({ email, password: 'wrong' })
+      expectError(401, errors.INCORRECT_CREDENTIALS, response)
+    })
+
+    it('should throw EMAIL_NOT_CONFIRMED if email is not confirmed', async () => {
+      const email = `unconfirmed${Date.now()}@test.com` // інший унікальний email
+      await app.post('/auth/signup').send({ ...user, email, isEmailConfirmed: false })
+
+      const response = await app.post('/auth/login').send({ email, password: 'testpass_135' })
+      expectError(401, errors.EMAIL_NOT_CONFIRMED, response)
+    })
+  })
+
   describe('Google auth endpoint', () => {
     it('should login user via google and return tokens', async () => {
       const response = await app.post('/auth/google-auth').send({
