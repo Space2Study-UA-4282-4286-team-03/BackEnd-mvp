@@ -86,11 +86,31 @@ const updatePassword = async (req, res) => {
   res.status(204).end()
 }
 
+const confirmEmail = async (req, res) => {
+  const { token } = req.query
+
+  await authService.confirmEmail(token)
+
+  res.status(200).json({
+    message: 'Email successfully confirmed'
+  })
+}
+
+const googleAuth = async (req, res) => {
+  const { credential } = req.body
+
+  const tokens = await authService.googleAuth(credential)
+
+  res.status(200).json(tokens)
+}
+
 module.exports = {
   signup,
   login,
   logout,
   refreshAccessToken,
   sendResetPasswordEmail,
-  updatePassword
+  updatePassword,
+  confirmEmail,
+  googleAuth
 }

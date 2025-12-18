@@ -12,7 +12,7 @@ describe('Auth controller', () => {
   let app, server, signupResponse
 
   beforeAll(async () => {
-    ; ({ app, server } = await serverInit())
+    ;({ app, server } = await serverInit())
   })
 
   beforeEach(async () => {
@@ -112,6 +112,17 @@ describe('Auth controller', () => {
       const response = await app.patch('/auth/reset-password/invalid-token').send({ password: 'valid_pass1' })
 
       expectError(400, errors.BAD_RESET_TOKEN, response)
+    })
+  })
+
+  describe('Google auth endpoint', () => {
+    it('should login user via google and return tokens', async () => {
+      const response = await app.post('/auth/google-auth').send({
+        credential: 'valid-google-token'
+      })
+
+      expect(response.status).toBe(200)
+      expect(response.body).toHaveProperty('accessToken')
     })
   })
 })
