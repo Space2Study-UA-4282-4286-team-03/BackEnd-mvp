@@ -87,7 +87,7 @@ const updatePassword = async (req, res) => {
 }
 
 const confirmEmail = async (req, res) => {
-  const { token } = req.query
+  const { token } = req.params
 
   await authService.confirmEmail(token)
 

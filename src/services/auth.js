@@ -115,14 +115,17 @@ const authService = {
 
   confirmEmail: async (confirmToken) => {
     const tokenData = tokenService.validateConfirmToken(confirmToken)
-    const tokenFromDB = await tokenService.findToken(confirmToken, CONFIRM_TOKEN)
 
-    if (!tokenData || !tokenFromDB) {
+    if (!tokenData) {
+      throw createError(400, BAD_CONFIRM_TOKEN)
+    }
+
+    const tokenFromDB = await tokenService.findToken(confirmToken, CONFIRM_TOKEN)
+    if (!tokenFromDB) {
       throw createError(400, BAD_CONFIRM_TOKEN)
     }
 
     const user = await getUserById(tokenData.id)
-
     if (!user) {
       throw createError(404, USER_NOT_FOUND)
     }
@@ -131,11 +134,9 @@ const authService = {
       throw createError(400, EMAIL_ALREADY_CONFIRMED)
     }
 
-    await privateUpdateUser(user._id, {
-      isEmailConfirmed: true
-    })
-
+    await privateUpdateUser(user._id, { isEmailConfirmed: true })
     await tokenService.removeConfirmToken(user._id)
+
     return { success: true }
   },
 
