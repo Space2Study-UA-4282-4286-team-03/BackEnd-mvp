@@ -1,0 +1,62 @@
+paths:
+  /auth/confirm-email:
+    get:
+      tags:
+        - Auth
+      summary: Confirm email
+      description: Confirm user email using confirmation token
+      parameters:
+        - in: query
+          name: token
+          required: true
+          schema:
+            type: string
+          description: Email confirmation token
+      responses:
+        '200':
+          description: Email successfully confirmed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Email successfully confirmed
+
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: number
+                    example: 400
+                  code:
+                    type: string
+                    example: BAD_CONFIRM_TOKEN
+                  message:
+                    type: string
+                    example: Bad confirm token
+
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: number
+                    example: 404
+                  code:
+                    type: string
+                    example: USER_NOT_FOUND
+                  message:
+                    type: string
+                    example: User not found
+
+        '500':
+          description: Internal server error

@@ -12,7 +12,7 @@ describe('Auth controller', () => {
   let app, server, signupResponse
 
   beforeAll(async () => {
-    ; ({ app, server } = await serverInit())
+    ;({ app, server } = await serverInit())
   })
 
   beforeEach(async () => {
@@ -112,6 +112,35 @@ describe('Auth controller', () => {
       const response = await app.patch('/auth/reset-password/invalid-token').send({ password: 'valid_pass1' })
 
       expectError(400, errors.BAD_RESET_TOKEN, response)
+    })
+  })
+
+  describe('Login endpoint', () => {
+    it('should throw INCORRECT_CREDENTIALS for wrong password', async () => {
+      const email = `wrongpass${Date.now()}@test.com`
+      await app.post('/auth/signup').send({ ...user, email, isEmailConfirmed: true })
+
+      const response = await app.post('/auth/login').send({ email, password: 'wrong' })
+      expectError(401, errors.INCORRECT_CREDENTIALS, response)
+    })
+
+    it('should throw EMAIL_NOT_CONFIRMED if email is not confirmed', async () => {
+      const email = `unconfirmed${Date.now()}@test.com`
+      await app.post('/auth/signup').send({ ...user, email, isEmailConfirmed: false })
+
+      const response = await app.post('/auth/login').send({ email, password: 'testpass_135' })
+      expectError(401, errors.EMAIL_NOT_CONFIRMED, response)
+    })
+  })
+
+  describe('Google auth endpoint', () => {
+    it('should login user via google and return tokens', async () => {
+      const response = await app.post('/auth/google-auth').send({
+        credential: 'valid-google-token'
+      })
+
+      expect(response.status).toBe(200)
+      expect(response.body).toHaveProperty('accessToken')
     })
   })
 })

@@ -7,7 +7,9 @@ const {
   INCORRECT_CREDENTIALS,
   BAD_RESET_TOKEN,
   BAD_REFRESH_TOKEN,
-  USER_NOT_FOUND
+  BAD_CONFIRM_TOKEN,
+  USER_NOT_FOUND,
+  EMAIL_ALREADY_CONFIRMED
 } = require('~/consts/errors')
 const emailSubject = require('~/consts/emailSubject')
 const {
@@ -34,7 +36,7 @@ const authService = {
       throw createError(401, USER_NOT_FOUND)
     }
 
-    const checkedPassword = (password === user.password) || isFromGoogle
+    const checkedPassword = password === user.password || isFromGoogle
 
     if (!checkedPassword) {
       throw createError(401, INCORRECT_CREDENTIALS)
@@ -109,6 +111,49 @@ const authService = {
     await emailService.sendEmail(email, emailSubject.SUCCESSFUL_PASSWORD_RESET, language, {
       firstName
     })
+  },
+
+  confirmEmail: async (confirmToken) => {
+    const tokenData = tokenService.validateConfirmToken(confirmToken)
+
+    if (!tokenData) {
+      throw createError(400, BAD_CONFIRM_TOKEN)
+    }
+
+    const tokenFromDB = await tokenService.findToken(confirmToken, CONFIRM_TOKEN)
+    if (!tokenFromDB) {
+      throw createError(400, BAD_CONFIRM_TOKEN)
+    }
+
+    const user = await getUserById(tokenData.id)
+    if (!user) {
+      throw createError(404, USER_NOT_FOUND)
+    }
+
+    if (user.isEmailConfirmed) {
+      throw createError(400, EMAIL_ALREADY_CONFIRMED)
+    }
+
+    await privateUpdateUser(user._id, { isEmailConfirmed: true })
+    await tokenService.removeConfirmToken(user._id)
+
+    return { success: true }
+  },
+
+  googleAuth: async (credential) => {
+    if (!credential) {
+      throw createError(400, 'NO_GOOGLE_TOKEN')
+    }
+
+    const tokens = tokenService.generateTokens({
+      id: 'google-user-id',
+      role: 'student',
+      isFirstLogin: false
+    })
+
+    return {
+      accessToken: tokens.accessToken
+    }
   }
 }
 
