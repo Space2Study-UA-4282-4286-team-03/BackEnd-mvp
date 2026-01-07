@@ -56,6 +56,26 @@ SpaceToStudy project is a platform where experts in various fields share their k
 $ npm install
 ```
 
+### Install redis for caching countries list in stepper form
+
+install for windows
+1.Open command line as administrator 2. Windows doesn't support work with redis, therefore you need to install a Ubuntu distributive. For this enter command: - wsl --install
+Every next time you need first run wsl typing command: - wsl 3. After successfully install wsl you need to upgrade packeges. For this type: - sudo apt update  
+ - sudo apt upgrade -y 4. Install redis: - sudo apt install redis-server -y 5. To start Redis server: - sudo service redis-server start 6. For check does the redis work: - redis-cli ping
+If redis work properly you'll see in a console text "PONG" 7. For stop redis server type command: - sudo service redis-server stop 8. For check redis status: - sudo service redis-server status
+
+Install for macOS
+
+1. Install HomeBrew - /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+   2.Install Redis - brew install redis
+   3.Run redis - brew services start redis
+2. Checking redis work: - redis-cli ping
+   If working OK you'll see text "PONG"
+3. To stopping redis server:
+   - brew services stop redis
+4. Checking redis status:
+   - brew services list
+
 ### How to run local
 
 1. Open terminal.
