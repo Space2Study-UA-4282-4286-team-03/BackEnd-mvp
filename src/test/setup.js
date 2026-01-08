@@ -12,12 +12,19 @@ const serverInit = async () => {
 }
 
 const serverCleanup = async () => {
-  await mongoose.connection.db.dropDatabase()
+  if (mongoose.connection.readyState !== 1) return
+  if (mongoose.connection.db) {
+    await mongoose.connection.db.dropDatabase()
+  }
 }
 
 const stopServer = async (server) => {
-  await mongoose.connection.close()
-  await server.close()
+  if (mongoose.connection.readyState === 1) {
+    await mongoose.connection.close()
+  }
+  if (server?.close) {
+    await server.close()
+  }
 }
 
 module.exports = { serverInit, serverCleanup, stopServer }

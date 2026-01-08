@@ -45,7 +45,7 @@
     "winston-mongodb": "^5.0.7"
   },
   "lint-staged": {
-    "*.{js}": [
+    "*.js": [
       "eslint --fix",
       "prettier --write"
     ]
