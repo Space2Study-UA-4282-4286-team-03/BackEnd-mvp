@@ -5,6 +5,7 @@ const {
 } = require('~/consts/validation')
 const errors = require('~/consts/errors')
 const tokenService = require('~/services/token')
+const authService = require('~/services/auth')
 const Token = require('~/models/token')
 const { expectError } = require('~/test/helpers')
 
@@ -133,14 +134,42 @@ describe('Auth controller', () => {
     })
   })
 
+  // describe('Google auth endpoint', () => {
+  //   it('should login user via google and return tokens', async () => {
+  //     const response = await app.post('/auth/google-auth').send({
+  //       idToken: 'valid-google-token'
+  //     })
+
+  //     expect(response.status).toBe(200)
+  //     expect(response.body).toHaveProperty('accessToken')
+  //   })
+  // })
   describe('Google auth endpoint', () => {
+    beforeEach(() => {
+      jest.spyOn(authService, 'googleLogin').mockResolvedValue({
+        accessToken: 'mockAccessToken',
+        refreshToken: 'mockRefreshToken'
+      })
+    })
+
+    afterEach(() => {
+      jest.restoreAllMocks() // Відновлюємо оригінальні методи після кожного тесту
+    })
+
     it('should login user via google and return tokens', async () => {
       const response = await app.post('/auth/google-auth').send({
-        credential: 'valid-google-token'
+        idToken: 'valid-google-token', // Тепер поле співпадає з контролером
+        language: 'en'
       })
 
       expect(response.status).toBe(200)
-      expect(response.body).toHaveProperty('accessToken')
+      expect(response.body).toHaveProperty('accessToken', 'mockAccessToken')
+      expect(response.headers['set-cookie']).toEqual(
+        expect.arrayContaining([
+          expect.stringContaining('accessToken=mockAccessToken'),
+          expect.stringContaining('refreshToken=mockRefreshToken')
+        ])
+      )
     })
   })
 })
