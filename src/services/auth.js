@@ -16,6 +16,10 @@ const {
   tokenNames: { REFRESH_TOKEN, RESET_TOKEN, CONFIRM_TOKEN }
 } = require('~/consts/auth')
 
+const { OAuth2Client } = require('google-auth-library')
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
+
 const authService = {
   signup: async (role, firstName, lastName, email, password, language) => {
     const user = await createUser(role, firstName, lastName, email, password, language)
@@ -58,6 +62,30 @@ const authService = {
     await privateUpdateUser(_id, { lastLogin: new Date() })
 
     return tokens
+  },
+  googleLogin: async (idToken, language) => {
+    let payload
+
+    try {
+      const ticket = await googleClient.verifyIdToken({
+        idToken,
+        audience: process.env.GOOGLE_CLIENT_ID
+      })
+
+      payload = ticket.getPayload()
+    } catch (err) {
+      throw createError(401, 'INVALID_GOOGLE_TOKEN')
+    }
+
+    const { email, given_name, family_name } = payload
+
+    let user = await getUserByEmail(email)
+
+    if (!user) {
+      user = await createUser('student', given_name || 'Google', family_name || 'User', email, null, language)
+    }
+
+    return authService.login(email, null, true)
   },
 
   logout: async (refreshToken) => {

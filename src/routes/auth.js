@@ -31,6 +31,7 @@ router.patch(
   langMiddleware,
   asyncWrapper(authController.updatePassword)
 )
+router.post('/google', langMiddleware, asyncWrapper(authController.googleAuth))
 
 router.get('/confirm-email/:token', asyncWrapper(authController.confirmEmail))
 
