@@ -1,11 +1,15 @@
 jest.mock('~/consts/errors', () => ({
-  enums: {
-    INVALID_LANGUAGE: 'Invalid language'
-  }
+  INVALID_LANGUAGE: 'Invalid language'
 }))
+
 jest.mock('~/utils/errorsHelper', () => ({
-  createError: jest.fn((status, errorInfo) => new Error(errorInfo))
+  createError: jest.fn((errorInfo) => {
+    const error = new Error(errorInfo.message)
+    error.code = errorInfo.code
+    return error
+  })
 }))
+
 jest.mock('~/consts/validation', () => ({
   enums: {
     APP_LANG_ENUM: ['en', 'ua']
@@ -35,7 +39,7 @@ describe('appLanguage middleware', () => {
   })
   test('should throw an error if an invalid language is provided', () => {
     const invalidLangError = new Error(INVALID_LANGUAGE)
-    req.acceptsLanguages.mockReturnValue(null | false)
+    req.acceptsLanguages.mockReturnValue(false)
     createError.mockReturnValue(invalidLangError)
     expect(() => langMiddleware(req, res, next)).toThrow(invalidLangError)
     expect(createError).toHaveBeenCalledWith(400, INVALID_LANGUAGE)
