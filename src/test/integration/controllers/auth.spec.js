@@ -134,16 +134,6 @@ describe('Auth controller', () => {
     })
   })
 
-  // describe('Google auth endpoint', () => {
-  //   it('should login user via google and return tokens', async () => {
-  //     const response = await app.post('/auth/google-auth').send({
-  //       idToken: 'valid-google-token'
-  //     })
-
-  //     expect(response.status).toBe(200)
-  //     expect(response.body).toHaveProperty('accessToken')
-  //   })
-  // })
   describe('Google auth endpoint', () => {
     beforeEach(() => {
       jest.spyOn(authService, 'googleLogin').mockResolvedValue({
