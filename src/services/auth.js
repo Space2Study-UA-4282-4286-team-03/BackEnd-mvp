@@ -74,6 +74,7 @@ const authService = {
 
       payload = ticket.getPayload()
     } catch (err) {
+      console.error('Google token verification failed:', err.message)
       throw createError(401, 'INVALID_GOOGLE_TOKEN')
     }
 
@@ -82,7 +83,7 @@ const authService = {
     let user = await getUserByEmail(email)
 
     if (!user) {
-      user = await createUser('student', given_name || 'Google', family_name || 'User', email, null, language)
+      user = await createUser('student', given_name || 'Google', family_name || 'User', email, null, language, true)
     }
 
     return authService.login(email, null, true)

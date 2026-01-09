@@ -143,12 +143,12 @@ describe('Auth controller', () => {
     })
 
     afterEach(() => {
-      jest.restoreAllMocks() // Відновлюємо оригінальні методи після кожного тесту
+      jest.restoreAllMocks()
     })
 
     it('should login user via google and return tokens', async () => {
       const response = await app.post('/auth/google-auth').send({
-        idToken: 'valid-google-token', // Тепер поле співпадає з контролером
+        idToken: 'valid-google-token',
         language: 'en'
       })
 

@@ -7,6 +7,12 @@ info:
 servers:
   - url: http://localhost:8080
 
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
 paths:
   /auth/signup:
     post:
@@ -61,6 +67,8 @@ paths:
       summary: User logout
       tags:
         - Auth
+      security:
+        - BearerAuth: []
       responses:
         '200':
           description: successfully logged out
@@ -70,6 +78,8 @@ paths:
       summary: Refresh access token
       tags:
         - Auth
+      security:
+        - BearerAuth: []
       responses:
         '200':
           description: New access token
