@@ -7,12 +7,12 @@ info:
 servers:
   - url: http://localhost:8080
 
-    components:
-    securitySchemes:
-      BearerAuth:
-        type: http
-        scheme: bearer
-        bearerFormat: JWT
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
 paths:
   /auth/signup:
     post:
