@@ -1,7 +1,3 @@
-const langMiddleware = require('~/middlewares/appLanguage')
-const { createError } = require('~/utils/errorsHelper')
-const { INVALID_LANGUAGE } = require('~/consts/errors')
-
 jest.mock('~/consts/errors', () => ({
   INVALID_LANGUAGE: 'Invalid language'
 }))
@@ -20,6 +16,9 @@ jest.mock('~/consts/validation', () => ({
   }
 }))
 
+const langMiddleware = require('~/middlewares/appLanguage')
+const { createError } = require('~/utils/errorsHelper')
+const { INVALID_LANGUAGE } = require('~/consts/errors')
 describe('appLanguage middleware', () => {
   let req
   let res

@@ -8,7 +8,7 @@ servers:
   - url: http://localhost:8080
 
 paths:
-  /signup:
+  /auth/signup:
     post:
       summary: Register a new user
       tags:
@@ -32,7 +32,7 @@ paths:
         '400':
           description: Incorrect data
 
-  /login:
+  /auth/login:
     post:
       summary: User login
       tags:
@@ -56,7 +56,7 @@ paths:
         '401':
           description: Incorrect email or password
 
-  /logout:
+  /auth/logout:
     post:
       summary: User logout
       tags:
@@ -65,7 +65,7 @@ paths:
         '200':
           description: successfully logged out
 
-  /refresh:
+  /auth/refresh:
     get:
       summary: Refresh access token
       tags:
@@ -76,7 +76,7 @@ paths:
         '401':
           description: Incorrect or missing refresh token
 
-  /forgot-password:
+  /auth/forgot-password:
     post:
       summary: Request password reset (currently not implemented)
       tags:
@@ -98,7 +98,7 @@ paths:
         '404':
           description: User not found
 
-  /reset-password/{token}:
+  /auth/reset-password/{token}:
     patch:
       summary: Change password by token (currently not implemented)
       tags:
