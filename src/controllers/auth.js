@@ -113,7 +113,6 @@ module.exports = {
   signup,
   login,
   logout,
-  googleAuth,
   refreshAccessToken,
   sendResetPasswordEmail,
   updatePassword,
