@@ -8,7 +8,7 @@ const {
 const scheduledCronJobs = require('~/cron-jobs/scheduledCronJobs')
 
 const serverSetup = async (app) => {
-  if (!process.env.GOOGLE_CLIENT_ID) {
+  if (!process.env.GMAIL_CLIENT_ID) {
     throw new Error('Missing required environment variable: GOOGLE_CLIENT_ID')
   }
   await databaseInitialization()
