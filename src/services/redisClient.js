@@ -1,27 +1,30 @@
 const { createClient } = require('redis')
 
-let clientPromise = null
+let redisClient = null
+let isConnected = false
 
 function getRedisClient() {
-  if (!clientPromise) {
-    const client = createClient({ url: process.env.REDIS_URL || 'redis://localhost:6379' })
+  if (!redisClient) {
+    redisClient = createClient({ url: 'redis://localhost:6379' })
 
-    client.on('error', (err) => {
+    redisClient.on('error', (err) => {
       console.warn('Redis error', err.message)
+      isConnected = false
     })
 
-    clientPromise = client
+    redisClient
       .connect()
       .then(() => {
         console.log('Redis connected')
-        return client
+        isConnected = true
       })
       .catch((err) => {
         console.warn('Redis connection failed, continuing without cache:', err.message)
-        return null
+        isConnected = false
       })
   }
-  return clientPromise
+
+  return isConnected ? redisClient : null
 }
 
 module.exports = getRedisClient

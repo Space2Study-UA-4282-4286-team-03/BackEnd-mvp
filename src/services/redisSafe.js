@@ -1,8 +1,8 @@
 const getRedisClient = require('./redisClient')
-const logger = require('~/logger')
+const logger = require('~/logger/logger')
 
 async function safeGet(key) {
-  const client = getRedisClient()
+  const client = await getRedisClient()
   if (!client) return null
   try {
     return await client.get(key)
@@ -13,7 +13,7 @@ async function safeGet(key) {
 }
 
 async function safeSetEx(key, ttl, value) {
-  const client = getRedisClient()
+  const client = await getRedisClient()
   if (!client) return
   try {
     await client.setEx(key, ttl, value)

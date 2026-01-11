@@ -60,15 +60,15 @@ $ npm install
 
 +#### Windows Installation (via WSL)
 
-- +1. Open command line as administrator
-  +2. Install WSL (Windows Subsystem for Linux):
+- 1. Open command line as administrator
+  2. Install WSL (Windows Subsystem for Linux):
 - ```shell
 
   ```
 
 - wsl --install
 - ```
-  +3. Start WSL:
+  3. Start WSL:
   ```
 - ```shell
 
@@ -77,7 +77,7 @@ $ npm install
   wsl
 
 - ```
-  +4. Update packages:
+  4. Update packages:
   ```
 - ```shell
 
@@ -86,7 +86,7 @@ $ npm install
 - sudo apt update
 - sudo apt upgrade -y
 - ```
-  +5. Install Redis:
+  5. Install Redis:
   ```
 - ```shell
 
@@ -94,7 +94,7 @@ $ npm install
 
 - sudo apt install redis-server -y
 - ```
-  +6. Start Redis server:
+  6. Start Redis server:
   ```
 - ```shell
 
@@ -102,7 +102,7 @@ $ npm install
 
 - sudo service redis-server start
 - ```
-  +7. Verify Redis is working:
+  7. Verify Redis is working:
   ```
 - ```shell
 
@@ -111,7 +111,7 @@ $ npm install
 - redis-cli ping
 - ```
   Expected output: `PONG`
-  +8. To stop Redis server:
+  8. To stop Redis server:
   ```
 - ```shell
 
@@ -119,7 +119,7 @@ $ npm install
 
 - sudo service redis-server stop
 - ```
-  +9. To check Redis status:
+  9. To check Redis status:
   ```
 - ```shell
 
@@ -132,38 +132,37 @@ $ npm install
 
 #### macOS Installation
 
-+1. Install Homebrew:
+1. Install Homebrew:
 
 ```shell
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
 
-+2. Install Redis:
+2. Install Redis:
 
 ```shell
 brew install redis
 ```
 
-+3. Start Redis:
+3. Start Redis:
 
 ```shell
 brew services start redis
 ```
 
-+4. Verify Redis is working:
+4. Verify Redis is working:
 
 ```shell
 redis-cli ping
 ```
 
-Expected output: `PONG`
-+5. To stop Redis server:
+Expected output: `PONG` 5. To stop Redis server:
 
 ```shell
 brew services stop redis
 ```
 
-+6. To check Redis status:
+6. To check Redis status:
 
 ```shell
 brew services list
