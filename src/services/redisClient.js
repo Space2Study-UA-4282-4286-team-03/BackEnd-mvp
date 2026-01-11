@@ -5,7 +5,7 @@ let isConnected = false
 
 function getRedisClient() {
   if (!redisClient) {
-    redisClient = createClient({ url: 'redis://localhost:6379' })
+    redisClient = createClient({ url: process.env.REDIS_URL || 'redis://localhost:6379' })
 
     redisClient.on('error', (err) => {
       console.warn('Redis error', err.message)
