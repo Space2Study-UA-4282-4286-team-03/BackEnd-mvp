@@ -1,4 +1,5 @@
 const getRedisClient = require('./redisClient')
+const logger = require('~/logger')
 
 async function safeGet(key) {
   const client = getRedisClient()
@@ -6,7 +7,7 @@ async function safeGet(key) {
   try {
     return await client.get(key)
   } catch (e) {
-    console.warn(`Redis GET failed for key ${key}`, e.message)
+    logger.warn('Redis GET operation failed', { key, error: e.message })
     return null
   }
 }
@@ -17,7 +18,7 @@ async function safeSetEx(key, ttl, value) {
   try {
     await client.setEx(key, ttl, value)
   } catch (e) {
-    console.warn(`Redis SET failed for key ${key}`, e.message)
+    logger.warn('Redis SET operation failed', { key, ttl, error: e.message })
   }
 }
 

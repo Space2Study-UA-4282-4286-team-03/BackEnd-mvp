@@ -19,6 +19,7 @@ async function getCountries(req, res) {
     console.log('Countries cache miss - data fetched from API')
     res.json(normalized)
   } catch (e) {
+    console.error('Failed to load countries:', e)
     res.status(500).json({ message: 'Failed to load countries' })
   }
 }
