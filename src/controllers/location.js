@@ -1,5 +1,6 @@
 const { fetchCountriesFromApi, normalizeCountries } = require('~/services/location')
 const { safeGet, safeSetEx } = require('~/services/redisSafe')
+const logger = require('~/logger/logger')
 
 const COUNTRIES_CACHE_KEY = 'countries:list'
 const COUNTRIES_TTL = 60 * 60 * 24
@@ -9,17 +10,17 @@ async function getCountries(req, res) {
   try {
     const cachedCountries = await safeGet(COUNTRIES_CACHE_KEY)
     if (cachedCountries) {
-      console.log('Countries cache hit')
+      logger.info('Countries cache hit')
       return res.json(JSON.parse(cachedCountries))
     }
 
     const rawData = await fetchCountriesFromApi()
     const normalized = normalizeCountries(rawData)
     await safeSetEx(COUNTRIES_CACHE_KEY, COUNTRIES_TTL, JSON.stringify(normalized))
-    console.log('Countries cache miss - data fetched from API')
+    logger.info('Countries cache miss - data fetched from API')
     res.json(normalized)
   } catch (e) {
-    console.error('Failed to load countries:', e)
+    logger.error('Failed to load countries:', e)
     res.status(500).json({ message: 'Failed to load countries' })
   }
 }
@@ -30,7 +31,7 @@ async function getCitiesByCountry(req, res) {
 
     const cachedCities = await safeGet(CITIES_CACHE_KEY)
     if (cachedCities) {
-      console.log(`Cities cache hit for ${countryId}`)
+      logger.info(`Cities cache hit for ${countryId}`)
       return res.json(JSON.parse(cachedCities))
     }
 
@@ -38,12 +39,12 @@ async function getCitiesByCountry(req, res) {
 
     if (countries) {
       countries = JSON.parse(countries)
-      console.log('Countries cache hit while fetching cities')
+      logger.info('Countries cache hit while fetching cities')
     } else {
       const rawData = await fetchCountriesFromApi()
       countries = normalizeCountries(rawData)
       await safeSetEx(COUNTRIES_CACHE_KEY, COUNTRIES_TTL, JSON.stringify(countries))
-      console.log('Countries cache miss while fetching cities')
+      logger.info('Countries cache miss while fetching cities')
     }
 
     const country = countries.find((c) => c.id === countryId)
@@ -53,11 +54,11 @@ async function getCitiesByCountry(req, res) {
 
     const cities = country.cities || []
     await safeSetEx(CITIES_CACHE_KEY, CITIES_TTL, JSON.stringify(cities))
-    console.log(`Cities cache miss for ${countryId} - cached now`)
+    logger.info(`Cities cache miss for ${countryId} - cached now`)
 
     res.json(cities)
   } catch (e) {
-    console.error(e)
+    logger.error(e)
     res.status(500).json({ message: 'Failed to load cities' })
   }
 }
