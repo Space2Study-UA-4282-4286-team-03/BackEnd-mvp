@@ -56,6 +56,118 @@ SpaceToStudy project is a platform where experts in various fields share their k
 $ npm install
 ```
 
+### Install Redis for Caching Countries List in Stepper Form
+
++#### Windows Installation (via WSL)
+
+- 1. Open command line as administrator
+  2. Install WSL (Windows Subsystem for Linux):
+- ```shell
+
+  ```
+
+- wsl --install
+- ```
+  3. Start WSL:
+  ```
+- ```shell
+
+  ```
+
+  wsl
+
+- ```
+  4. Update packages:
+  ```
+- ```shell
+
+  ```
+
+- sudo apt update
+- sudo apt upgrade -y
+- ```
+  5. Install Redis:
+  ```
+- ```shell
+
+  ```
+
+- sudo apt install redis-server -y
+- ```
+  6. Start Redis server:
+  ```
+- ```shell
+
+  ```
+
+- sudo service redis-server start
+- ```
+  7. Verify Redis is working:
+  ```
+- ```shell
+
+  ```
+
+- redis-cli ping
+- ```
+  Expected output: `PONG`
+  8. To stop Redis server:
+  ```
+- ```shell
+
+  ```
+
+- sudo service redis-server stop
+- ```
+  9. To check Redis status:
+  ```
+- ```shell
+
+  ```
+
+- sudo service redis-server status
+- ```
+
+  ```
+
+#### macOS Installation
+
+1. Install Homebrew:
+
+```shell
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+2. Install Redis:
+
+```shell
+brew install redis
+```
+
+3. Start Redis:
+
+```shell
+brew services start redis
+```
+
+4. Verify Redis is working:
+
+```shell
+redis-cli ping
+```
+
+Expected output: `PONG` 5. To stop Redis server:
+
+```shell
+brew services stop redis
+```
+
+6. To check Redis status:
+
+```shell
+brew services list
+```
+
 ### How to run local
 
 1. Open terminal.
