@@ -37,6 +37,19 @@ const login = async (req, res) => {
   res.status(200).json(tokens)
 }
 
+const googleAuth = async (req, res) => {
+  const { idToken, language } = req.body
+
+  const tokens = await authService.googleLogin(idToken, language)
+
+  res.cookie(ACCESS_TOKEN, tokens.accessToken, COOKIE_OPTIONS)
+  res.cookie(REFRESH_TOKEN, tokens.refreshToken, COOKIE_OPTIONS)
+
+  delete tokens.refreshToken
+
+  res.status(200).json(tokens)
+}
+
 const logout = async (req, res) => {
   const { refreshToken } = req.cookies
 
@@ -86,11 +99,23 @@ const updatePassword = async (req, res) => {
   res.status(204).end()
 }
 
+const confirmEmail = async (req, res) => {
+  const { token } = req.params
+
+  await authService.confirmEmail(token)
+
+  res.status(200).json({
+    message: 'Email successfully confirmed'
+  })
+}
+
 module.exports = {
   signup,
   login,
   logout,
   refreshAccessToken,
   sendResetPasswordEmail,
-  updatePassword
+  updatePassword,
+  confirmEmail,
+  googleAuth
 }

@@ -7,12 +7,18 @@ const {
   INCORRECT_CREDENTIALS,
   BAD_RESET_TOKEN,
   BAD_REFRESH_TOKEN,
-  USER_NOT_FOUND
+  BAD_CONFIRM_TOKEN,
+  USER_NOT_FOUND,
+  EMAIL_ALREADY_CONFIRMED
 } = require('~/consts/errors')
 const emailSubject = require('~/consts/emailSubject')
 const {
   tokenNames: { REFRESH_TOKEN, RESET_TOKEN, CONFIRM_TOKEN }
 } = require('~/consts/auth')
+
+const { OAuth2Client } = require('google-auth-library')
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
 
 const authService = {
   signup: async (role, firstName, lastName, email, password, language) => {
@@ -34,7 +40,7 @@ const authService = {
       throw createError(401, USER_NOT_FOUND)
     }
 
-    const checkedPassword = (password === user.password) || isFromGoogle
+    const checkedPassword = password === user.password || isFromGoogle
 
     if (!checkedPassword) {
       throw createError(401, INCORRECT_CREDENTIALS)
@@ -56,6 +62,31 @@ const authService = {
     await privateUpdateUser(_id, { lastLogin: new Date() })
 
     return tokens
+  },
+  googleLogin: async (idToken, language) => {
+    let payload
+
+    try {
+      const ticket = await googleClient.verifyIdToken({
+        idToken,
+        audience: process.env.GOOGLE_CLIENT_ID
+      })
+
+      payload = ticket.getPayload()
+    } catch (err) {
+      console.error('Google token verification failed:', err.message)
+      throw createError(401, 'INVALID_GOOGLE_TOKEN')
+    }
+
+    const { email, given_name, family_name } = payload
+
+    let user = await getUserByEmail(email)
+
+    if (!user) {
+      user = await createUser('student', given_name || 'Google', family_name || 'User', email, null, language, true)
+    }
+
+    return authService.login(email, null, true)
   },
 
   logout: async (refreshToken) => {
@@ -109,6 +140,49 @@ const authService = {
     await emailService.sendEmail(email, emailSubject.SUCCESSFUL_PASSWORD_RESET, language, {
       firstName
     })
+  },
+
+  confirmEmail: async (confirmToken) => {
+    const tokenData = tokenService.validateConfirmToken(confirmToken)
+
+    if (!tokenData) {
+      throw createError(400, BAD_CONFIRM_TOKEN)
+    }
+
+    const tokenFromDB = await tokenService.findToken(confirmToken, CONFIRM_TOKEN)
+    if (!tokenFromDB) {
+      throw createError(400, BAD_CONFIRM_TOKEN)
+    }
+
+    const user = await getUserById(tokenData.id)
+    if (!user) {
+      throw createError(404, USER_NOT_FOUND)
+    }
+
+    if (user.isEmailConfirmed) {
+      throw createError(400, EMAIL_ALREADY_CONFIRMED)
+    }
+
+    await privateUpdateUser(user._id, { isEmailConfirmed: true })
+    await tokenService.removeConfirmToken(user._id)
+
+    return { success: true }
+  },
+
+  googleAuth: async (credential) => {
+    if (!credential) {
+      throw createError(400, 'NO_GOOGLE_TOKEN')
+    }
+
+    const tokens = tokenService.generateTokens({
+      id: 'google-user-id',
+      role: 'student',
+      isFirstLogin: false
+    })
+
+    return {
+      accessToken: tokens.accessToken
+    }
   }
 }
 

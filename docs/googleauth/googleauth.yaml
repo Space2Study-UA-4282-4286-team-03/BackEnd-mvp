@@ -1,0 +1,46 @@
+/auth/google:
+  post:
+    summary: Login with Google
+    tags:
+      - Auth
+    description: Login a user via Google OAuth2.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - idToken
+            properties:
+              idToken:
+                type: string
+                description: Google ID token
+              language:
+                type: string
+                example: 'uk'
+    responses:
+      200:
+        description: Successful Google login
+        headers:
+          Set-Cookie:
+            description: Access and refresh tokens are set in httpOnly cookies
+            schema:
+              type: string
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                accessToken:
+                  type: string
+      401:
+        description: Invalid Google token
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: 'INVALID_GOOGLE_TOKEN'

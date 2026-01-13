@@ -1,0 +1,138 @@
+openapi: 3.0.0
+info:
+  title: Auth API
+  version: 1.0.0
+  description: Authentication and User Management API
+
+servers:
+  - url: http://localhost:8080
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+paths:
+  /auth/signup:
+    post:
+      summary: Register a new user
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: user@example.com
+                password:
+                  type: string
+                  example: password123
+      responses:
+        '201':
+          description: Created successfully
+        '400':
+          description: Incorrect data
+
+  /auth/login:
+    post:
+      summary: User login
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: user@example.com
+                password:
+                  type: string
+                  example: password123
+      responses:
+        '200':
+          description: Entered successfully
+        '401':
+          description: Incorrect email or password
+
+  /auth/logout:
+    post:
+      summary: User logout
+      tags:
+        - Auth
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: successfully logged out
+
+  /auth/refresh:
+    get:
+      summary: Refresh access token
+      tags:
+        - Auth
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: New access token
+        '401':
+          description: Incorrect or missing refresh token
+
+  /auth/forgot-password:
+    post:
+      summary: Request password reset (currently not implemented)
+      tags:
+        - Auth
+      description: This endpoint is part of the API spec but does not work until email service is set up.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: user@example.com
+      responses:
+        '200':
+          description: Request to reset password sent
+        '404':
+          description: User not found
+
+  /auth/reset-password/{token}:
+    patch:
+      summary: Change password by token (currently not implemented)
+      tags:
+        - Auth
+      description: This endpoint is part of the API spec but does not work until email service is set up.
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Token for password reset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  example: newPassword123
+      responses:
+        '200':
+          description: Password changed successfully
+        '400':
+          description: Incorrect token or password

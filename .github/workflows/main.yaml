@@ -64,3 +64,11 @@ jobs:
           GMAIL_REFRESH_TOKEN: ${{secrets.GMAIL_REFRESH_TOKEN}}
           GMAIL_REDIRECT_URI: ${{secrets.GMAIL_REDIRECT_URI}}
           COOKIE_DOMAIN: ${{secrets.COOKIE_DOMAIN}}
+
+      - name: 'Run SonarCloud Scan'
+        uses: SonarSource/sonarcloud-github-action@v2
+        with: 
+          projectKey: "space2study-ua-4282-4286-team-03"
+          organization: "Space2Study-UA-4282-4286-team-03"
+        env:
+          SONAR_TOKEN: ${{secrets.SONAR_TOKEN}}
