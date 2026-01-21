@@ -2,17 +2,6 @@ const express = require('express')
 const router = express.Router()
 const Subject = require('~/models/subjects')
 
-router.get('/categories', async (req, res) => {
-  console.log('GET /categories hit')
-  try {
-    const categories = await Subject.distinct('category')
-    res.json(categories)
-  } catch (error) {
-    console.error(error)
-    res.status(500).json({ message: 'Failed to fetch categories' })
-  }
-})
-
 router.get('/', async (req, res) => {
   try {
     const { category } = req.query
