@@ -23,8 +23,6 @@ const updateUser = async (req, res) => {
   const { id } = req.params
   const { role } = req.user
   const updateData = req.body
-  console.log('REQ BODY mainSubjects:', req.body.mainSubjects, 'TYPE:', typeof req.body.mainSubjects)
-  console.log('REQ BODY FULL:', JSON.stringify(req.body, null, 2))
 
   if (id !== req.user.id) throw createForbiddenError()
 
