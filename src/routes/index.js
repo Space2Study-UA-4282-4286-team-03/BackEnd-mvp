@@ -10,6 +10,7 @@ const offer = require('~/routes/offer')
 const location = require('~/routes/location')
 const subjects = require('~/routes/subjects')
 const categories = require('~/routes/categories')
+const uploadAvatar = require('~/routes/uploadAvatar')
 
 router.use('/auth', auth)
 router.use('/users', user)
@@ -21,5 +22,6 @@ router.use('/offers', offer)
 router.use('/locations', location)
 router.use('/api/subjects', subjects)
 router.use('/api/categories', categories)
+router.use('/tutor', uploadAvatar)
 
 module.exports = router
