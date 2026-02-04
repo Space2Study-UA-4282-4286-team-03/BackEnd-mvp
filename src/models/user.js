@@ -52,6 +52,7 @@ const userSchema = new Schema(
       city: { type: String }
     },
     photo: String,
+    photoPublicId: String,
     professionalSummary: String,
     mainSubjects: {
       student: {
