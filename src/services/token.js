@@ -102,7 +102,10 @@ const tokenService = {
     if (!Object.values(tokenNames).includes(tokenName)) {
       throw createError(404, INVALID_TOKEN_NAME)
     }
-    return Token.findOne({ user: userId }).lean().exec()
+    return Token.findOne({ user: userId, [tokenName]: { $ne: null } })
+      .select(`user ${tokenName}`)
+      .lean()
+      .exec()
   },
 
   findTokensWithUsersByParams: async (params) => {

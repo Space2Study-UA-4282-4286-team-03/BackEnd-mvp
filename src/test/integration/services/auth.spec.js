@@ -94,7 +94,7 @@ describe('Auth API (integration)', () => {
     })
   })
 
-  describe('POST /auth/refresh', () => {
+  describe('GET /auth/refresh', () => {
     it('should issue new access token with valid refresh token', async () => {
       await app.post('/auth/signup').send({
         role: 'student',
