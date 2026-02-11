@@ -1,6 +1,10 @@
 const { serverInit, serverCleanup, stopServer } = require('~/test/setup')
 const tokenService = require('~/services/token')
 const { getUserByEmail } = require('~/services/user')
+require('dotenv').config({
+  path: '.env.test.local'
+})
+
 const mongoose = require('mongoose')
 const {
   tokenNames: { CONFIRM_TOKEN }
@@ -35,7 +39,7 @@ describe('Auth API (integration)', () => {
         firstName: 'Ivan',
         lastName: 'Petrenko',
         email: 'ivan@test.com',
-        password: '123456Abc',
+        password: process.env.TEST_USER_PASSWORD,
         language: 'ua'
       })
 
@@ -55,13 +59,13 @@ describe('Auth API (integration)', () => {
         firstName: 'Ivan',
         lastName: 'Petrenko',
         email: 'login@test.com',
-        password: '123456Abc',
+        password: process.env.TEST_USER_PASSWORD,
         language: 'ua'
       })
 
       const res = await app.post('/auth/login').send({
         email: 'login@test.com',
-        password: '123456Abc'
+        password: process.env.TEST_USER_PASSWORD
       })
       expect(res.status).toBe(401)
     })
@@ -72,7 +76,7 @@ describe('Auth API (integration)', () => {
         firstName: 'Ivan',
         lastName: 'Petrenko',
         email: 'confirmed@test.com',
-        password: '123456Abc',
+        password: process.env.TEST_USER_PASSWORD,
         language: 'ua'
       })
 
@@ -85,7 +89,7 @@ describe('Auth API (integration)', () => {
 
       const res = await app.post('/auth/login').send({
         email: 'confirmed@test.com',
-        password: '123456Abc'
+        password: process.env.TEST_USER_PASSWORD
       })
 
       expect(res.body.error).toBeUndefined()
@@ -101,7 +105,7 @@ describe('Auth API (integration)', () => {
         firstName: 'Ivan',
         lastName: 'Petrenko',
         email: 'refresh@test.com',
-        password: '123456Abc',
+        password: process.env.TEST_USER_PASSWORD,
         language: 'ua'
       })
 
@@ -114,7 +118,7 @@ describe('Auth API (integration)', () => {
 
       const loginRes = await app.post('/auth/login').send({
         email: 'refresh@test.com',
-        password: '123456Abc'
+        password: process.env.TEST_USER_PASSWORD
       })
 
       expect(loginRes.body.error).toBeUndefined()
@@ -133,7 +137,7 @@ describe('Auth API (integration)', () => {
         firstName: 'Ivan',
         lastName: 'Petrenko',
         email: 'logout@test.com',
-        password: '123456Abc',
+        password: process.env.TEST_USER_PASSWORD,
         language: 'ua'
       })
 
@@ -145,7 +149,7 @@ describe('Auth API (integration)', () => {
 
       const loginRes = await app.post('/auth/login').send({
         email: 'logout@test.com',
-        password: '123456Abc'
+        password: process.env.TEST_USER_PASSWORD
       })
 
       const res = await app.post('/auth/logout').send({
@@ -163,7 +167,7 @@ describe('Auth API (integration)', () => {
         firstName: 'Ivan',
         lastName: 'Petrenko',
         email: 'confirm@test.com',
-        password: '123456Abc',
+        password: process.env.TEST_USER_PASSWORD,
         language: 'ua'
       })
 
