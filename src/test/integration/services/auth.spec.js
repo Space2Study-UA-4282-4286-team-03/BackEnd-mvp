@@ -18,6 +18,15 @@ describe('Auth API (integration)', () => {
   let app
   let server
 
+  const testUser = {
+    role: 'student',
+    firstName: 'Ivan',
+    lastName: 'Petrenko',
+    email: 'ivan@test.com',
+    password: process.env.TEST_USER_PASSWORD,
+    language: 'ua'
+  }
+
   beforeAll(async () => {
     const res = await serverInit()
     app = res.app
@@ -34,19 +43,12 @@ describe('Auth API (integration)', () => {
 
   describe('POST /auth/signup', () => {
     it('should create user and send confirmation email', async () => {
-      const res = await app.post('/auth/signup').send({
-        role: 'student',
-        firstName: 'Ivan',
-        lastName: 'Petrenko',
-        email: 'ivan@test.com',
-        password: process.env.TEST_USER_PASSWORD,
-        language: 'ua'
-      })
+      const res = await app.post('/auth/signup').send(testUser)
 
       expect(res.status).toBe(201)
       expect(res.body).toHaveProperty('userId')
 
-      const user = await getUserByEmail('ivan@test.com')
+      const user = await getUserByEmail(testUser.email)
       expect(user).toBeTruthy()
       expect(user.isEmailConfirmed).toBe(false)
     })
@@ -54,41 +56,27 @@ describe('Auth API (integration)', () => {
 
   describe('POST /auth/login', () => {
     it('should not allow login if email not confirmed', async () => {
-      await app.post('/auth/signup').send({
-        role: 'student',
-        firstName: 'Ivan',
-        lastName: 'Petrenko',
-        email: 'login@test.com',
-        password: process.env.TEST_USER_PASSWORD,
-        language: 'ua'
-      })
+      await app.post('/auth/signup').send(testUser)
 
       const res = await app.post('/auth/login').send({
-        email: 'login@test.com',
+        email: testUser.email,
         password: process.env.TEST_USER_PASSWORD
       })
       expect(res.status).toBe(401)
     })
 
     it('should login confirmed user and return tokens', async () => {
-      await app.post('/auth/signup').send({
-        role: 'student',
-        firstName: 'Ivan',
-        lastName: 'Petrenko',
-        email: 'confirmed@test.com',
-        password: process.env.TEST_USER_PASSWORD,
-        language: 'ua'
-      })
+      await app.post('/auth/signup').send(testUser)
 
       const User = mongoose.model('User')
-      const user = await User.findOne({ email: 'confirmed@test.com' })
+      const user = await User.findOne({ email: testUser.email })
       expect(user).toBeTruthy()
       user.isEmailConfirmed = true
       await user.save()
-      expect(user.email).toBe('confirmed@test.com')
+      expect(user.email).toBe(testUser.email)
 
       const res = await app.post('/auth/login').send({
-        email: 'confirmed@test.com',
+        email: testUser.email,
         password: process.env.TEST_USER_PASSWORD
       })
 
@@ -100,24 +88,17 @@ describe('Auth API (integration)', () => {
 
   describe('GET /auth/refresh', () => {
     it('should issue new access token with valid refresh token', async () => {
-      await app.post('/auth/signup').send({
-        role: 'student',
-        firstName: 'Ivan',
-        lastName: 'Petrenko',
-        email: 'refresh@test.com',
-        password: process.env.TEST_USER_PASSWORD,
-        language: 'ua'
-      })
+      await app.post('/auth/signup').send(testUser)
 
       const User = mongoose.model('User')
-      const user = await User.findOne({ email: 'refresh@test.com' })
+      const user = await User.findOne({ email: testUser.email })
       expect(user).toBeTruthy()
       user.isEmailConfirmed = true
       await user.save()
-      expect(user.email).toBe('refresh@test.com')
+      expect(user.email).toBe(testUser.email)
 
       const loginRes = await app.post('/auth/login').send({
-        email: 'refresh@test.com',
+        email: testUser.email,
         password: process.env.TEST_USER_PASSWORD
       })
 
@@ -132,23 +113,16 @@ describe('Auth API (integration)', () => {
 
   describe('POST /auth/logout', () => {
     it('should remove refresh token', async () => {
-      await app.post('/auth/signup').send({
-        role: 'student',
-        firstName: 'Ivan',
-        lastName: 'Petrenko',
-        email: 'logout@test.com',
-        password: process.env.TEST_USER_PASSWORD,
-        language: 'ua'
-      })
+      await app.post('/auth/signup').send(testUser)
 
       const user = await mongoose
         .model('User')
-        .findOneAndUpdate({ email: 'logout@test.com' }, { isEmailConfirmed: true }, { new: true })
+        .findOneAndUpdate({ email: testUser.email }, { isEmailConfirmed: true }, { new: true })
       user.isEmailConfirmed = true
       await user.save()
 
       const loginRes = await app.post('/auth/login').send({
-        email: 'logout@test.com',
+        email: testUser.email,
         password: process.env.TEST_USER_PASSWORD
       })
 
@@ -162,22 +136,15 @@ describe('Auth API (integration)', () => {
 
   describe('Email confirmation', () => {
     it('should confirm email using confirm token', async () => {
-      await app.post('/auth/signup').send({
-        role: 'student',
-        firstName: 'Ivan',
-        lastName: 'Petrenko',
-        email: 'confirm@test.com',
-        password: process.env.TEST_USER_PASSWORD,
-        language: 'ua'
-      })
+      await app.post('/auth/signup').send(testUser)
 
-      const user = await getUserByEmail('confirm@test.com')
+      const user = await getUserByEmail(testUser.email)
       const tokenDoc = await tokenService.getUserToken(user._id, CONFIRM_TOKEN)
       expect(tokenDoc).toBeTruthy()
       expect(tokenDoc.confirmToken).toBeDefined()
       const res = await app.get(`/auth/confirm-email/${tokenDoc.confirmToken}`)
       expect(res.status).toBe(200)
-      const updatedUser = await getUserByEmail('confirm@test.com')
+      const updatedUser = await getUserByEmail(testUser.email)
       expect(updatedUser.isEmailConfirmed).toBe(true)
     })
   })
