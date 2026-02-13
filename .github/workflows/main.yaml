@@ -16,7 +16,7 @@ jobs:
       # - name: Run DB
 
       - name: 'Start MongoDB'
-        uses: supercharge/mongodb-github-action@1.8.0
+        uses: supercharge/mongodb-github-action@1.11.0
         with:
           mongodb-version: latest
           mongodb-port: 27017
