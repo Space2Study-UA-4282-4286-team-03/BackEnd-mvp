@@ -8,22 +8,17 @@ on:
 
 jobs:
   Test_DEV:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - name: 'Checkout the Repo'
         uses: actions/checkout@v3
-
-      - name: Upgrade Docker
-        run: |
-          sudo apt-get update
-           sudo apt-get install --only-upgrade docker-ce docker-ce-cli containerd.io
 
       # - name: Run DB
 
       - name: 'Start MongoDB'
         uses: supercharge/mongodb-github-action@1.12.0
         with:
-          mongodb-version: '7.0'
+          mongodb-version: latest
           mongodb-port: 27017
           mongodb-username: ${{secrets.MONGODB_USER}}
           mongodb-password: ${{secrets.MONGODB_PASS}}
