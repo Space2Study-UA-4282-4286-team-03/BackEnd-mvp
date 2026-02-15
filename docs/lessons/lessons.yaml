@@ -1,0 +1,138 @@
+paths:
+  /lessons:
+    get:
+      summary: Get all lessons for the authenticated tutor
+      tags:
+        - Lessons
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: title
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter lessons by title
+        - name: categories
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter lessons by category ID
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >
+            JSON-encoded sort object, e.g. {"orderBy":"title","order":"asc"}.
+            Defaults to updatedAt descending.
+        - name: skip
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+          description: Number of items to skip (for pagination)
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+          description: Maximum number of items to return
+      responses:
+        '200':
+          description: Successfully retrieved lessons
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          example: 507f1f77bcf86cd799439011
+                        title:
+                          type: string
+                          example: Introduction to Algebra
+                        author:
+                          type: string
+                          example: 507f1f77bcf86cd799439012
+                        files:
+                          type: array
+                          items:
+                            type: string
+                          example: []
+                        category:
+                          type: object
+                          properties:
+                            _id:
+                              type: string
+                              example: 507f1f77bcf86cd799439013
+                            name:
+                              type: string
+                              example: Mathematics
+                        lastUpdated:
+                          type: string
+                          format: date-time
+                  count:
+                    type: integer
+                    example: 1
+        '401':
+          description: Unauthorized – missing or invalid access token
+        '403':
+          description: Forbidden – user does not have the Tutor role
+
+  /lessons/{id}:
+    get:
+      summary: Get a lesson by ID
+      tags:
+        - Lessons
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The lesson ID
+      responses:
+        '200':
+          description: Successfully retrieved the lesson
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  title:
+                    type: string
+                  author:
+                    type: string
+                  files:
+                    type: array
+                    items:
+                      type: string
+                  category:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                      name:
+                        type: string
+                  lastUpdated:
+                    type: string
+                    format: date-time
+        '401':
+          description: Unauthorized – missing or invalid access token
+        '403':
+          description: Forbidden – user does not have the Tutor role
+        '404':
+          description: Lesson not found
