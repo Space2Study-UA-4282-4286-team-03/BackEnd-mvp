@@ -11,6 +11,7 @@ const location = require('~/routes/location')
 const subjects = require('~/routes/subjects')
 const categories = require('~/routes/categories')
 const uploadAvatar = require('~/routes/uploadAvatar')
+const lessons = require('~/routes/lessons')
 
 router.use('/auth', auth)
 router.use('/users', user)
@@ -23,5 +24,6 @@ router.use('/locations', location)
 router.use('/api/subjects', subjects)
 router.use('/api/categories', categories)
 router.use('/tutor', uploadAvatar)
+router.use('/lessons', lessons)
 
 module.exports = router

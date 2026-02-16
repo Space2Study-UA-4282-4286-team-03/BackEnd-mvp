@@ -1,8 +1,21 @@
-const { createForbiddenError } = require('~/utils/errorsHelper')
+const { createUnauthorizedError, createForbiddenError } = require('~/utils/errorsHelper')
 const { tokenValidation } = require('../utils/tokenValidation')
 
 const authMiddleware = (req, _res, next) => {
-  const accessToken = req.cookies.accessToken || req.headers.cookie
+  let accessToken = null
+
+  if (req.cookies && req.cookies.accessToken) {
+    accessToken = req.cookies.accessToken
+  }
+
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+    accessToken = req.headers.authorization.split(' ')[1]
+  }
+
+  if (!accessToken) {
+    return next(createUnauthorizedError())
+  }
+
   const userData = tokenValidation(accessToken)
   req.user = userData
 
