@@ -45,7 +45,7 @@ const lessonsService = {
     if (author !== currentUserId) {
       throw createForbiddenError()
     }
-    const allowedFields = ['title', 'author', 'files', 'category', 'lastUpdated']
+    const allowedFields = ['title', 'files', 'category']
 
     for (const field of Object.keys(data)) {
       if (allowedFields.includes(field)) {
