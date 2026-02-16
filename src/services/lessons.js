@@ -1,6 +1,5 @@
 const Lesson = require('~/models/lessons')
-const { createForbiddenError } = require('~/utils/errorsHelper')
-const { createNotFoundError } = require('../utils/errorsHelper')
+const { createForbiddenError, createNotFoundError } = require('~/utils/errorsHelper')
 
 const lessonsService = {
   getLessons: async (match, sort, skip = 0, limit = 10) => {
