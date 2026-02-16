@@ -1,4 +1,6 @@
 const router = require('express').Router()
+const validationMiddleWare = require('~/middlewares/validation')
+const lessonValidationSchema = require('~/validation/schemas/lesson')
 
 const Lesson = require('~/models/lessons')
 
@@ -19,5 +21,6 @@ const params = [{ model: Lesson, idName: 'id' }]
 
 router.get('/', asyncWrapper(lessonsController.getLessons))
 router.get('/:id', isEntityValid({ params }), asyncWrapper(lessonsController.getLessonById))
+router.post('/', validationMiddleWare(lessonValidationSchema), asyncWrapper(lessonsController.createLesson))
 
 module.exports = router
