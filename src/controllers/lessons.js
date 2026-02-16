@@ -15,7 +15,12 @@ const getLessons = async (req, res) => {
   })
   const sortOptions = getSortOptions(sort)
 
-  const lessons = await lessonsService.getLessons(match, sortOptions, parseInt(skip), parseInt(limit))
+  const lessons = await lessonsService.getLessons(
+    match,
+    sortOptions,
+    skip ? parseInt(skip) : undefined,
+    limit ? parseInt(limit) : undefined
+  )
 
   res.status(200).json(lessons)
 }

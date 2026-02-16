@@ -1,5 +1,6 @@
 const Lesson = require('~/models/lessons')
 const { createForbiddenError } = require('~/utils/errorsHelper')
+const { createNotFoundError } = require('../utils/errorsHelper')
 
 const lessonsService = {
   getLessons: async (match, sort, skip = 0, limit = 10) => {
@@ -35,15 +36,21 @@ const lessonsService = {
 
   updateLesson: async (id, currentUserId, data) => {
     const lesson = await Lesson.findById(id).exec()
+    if (!lesson) {
+      throw createNotFoundError()
+    }
 
     const author = lesson.author.toString()
 
     if (author !== currentUserId) {
       throw createForbiddenError()
     }
+    const allowedFields = ['title', 'author', 'files', 'category', 'lastUpdated']
 
-    for (let field in data) {
-      lesson[field] = data[field]
+    for (const field of Object.keys(data)) {
+      if (allowedFields.includes(field)) {
+        lesson[field] = data[field]
+      }
     }
 
     lesson.lastUpdated = Date.now()
@@ -55,13 +62,17 @@ const lessonsService = {
   deleteLesson: async (id, currentUserId) => {
     const lesson = await Lesson.findById(id).exec()
 
+    if (!lesson) {
+      throw createNotFoundError()
+    }
+
     const author = lesson.author.toString()
 
     if (author !== currentUserId) {
       throw createForbiddenError()
     }
 
-    await Lesson.findByIdAndRemove(id).exec()
+    await Lesson.findByIdAndDelete(id).exec()
   }
 }
 
