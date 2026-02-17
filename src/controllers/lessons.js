@@ -37,7 +37,7 @@ const createLesson = async (req, res) => {
   const { id: author } = req.user
   const data = req.body
 
-  const newLesson = lessonsService.createLesson(author, data)
+  const newLesson = await lessonsService.createLesson(author, data)
   res.status(201).json(newLesson)
 }
 
