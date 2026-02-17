@@ -203,7 +203,7 @@ describe('Lessons controller', () => {
       expect(response.body.code).toBe('FIELD_IS_NOT_OF_PROPER_LENGTH')
     })
 
-    it('Should throw UNATHORIZED when no token is provided', async () => {
+    it('Should throw UNAUTHORIZED when no token is provided', async () => {
       const response = await app.post(endpointUrl).send({ title: 'test' })
 
       expectError(401, UNAUTHORIZED, response)
