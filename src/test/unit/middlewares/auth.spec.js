@@ -9,7 +9,7 @@ describe('Auth middleware', () => {
   const mockNextFunc = jest.fn()
 
   it('Should throw UNAUTHORIZED error when access token is not given', () => {
-    const mockRequest = { cookies: { accessToken: 'invalid_token' }, Headers: {} }
+    const mockRequest = { cookies: { accessToken: 'invalid_token' }, headers: {} }
 
     const middlewareFunc = () => authMiddleware(mockRequest, mockResponse, mockNextFunc)
 
