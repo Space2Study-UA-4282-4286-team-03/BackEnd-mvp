@@ -87,6 +87,77 @@ paths:
           description: Unauthorized – missing or invalid access token
         '403':
           description: Forbidden – user does not have the Tutor role
+    post:
+      summary: Create a new lesson
+      tags:
+        - Lesson
+      security:
+        - BearerAuth[]
+      requestBody:
+        - request: true
+      content:
+        application/JSON:
+          schema:
+            type: object
+        required:
+         - title
+        properties:  
+        title:
+        type: string
+        minLength: 1
+        maxLength: 50
+        example: introduction to algebra
+        files:
+        type: array
+        items:
+        type: string
+        example: ['notes.pdf', 'homework.pdf']
+        category:
+        type: string
+        description: objectId of a ResourcesCategory
+        example: 507f1f77bcf86cd799439013
+  responses: 
+  '201':
+  description: lesson created succesfully
+  content: 
+  application/json:
+  schema:
+  type: object
+  properties:
+  _id:
+  type: string
+  example: 507f1f77bcf86cd799439011
+  title:
+  type: string
+  example: Introduction to Algebra
+  author:
+  type: string
+  example: 507f1f77bcf86cd799439011
+  files:
+  type: array
+  items:
+  type: string
+  example: ['notes.pdf']
+  ctegory:
+  type: object
+  properties:
+  _id:
+  type: string
+  example: 507f1f77bcf86cd799439011
+  name:
+  type: string
+  example: Mathematics
+  lastUpdated:
+  type: string
+  format: date-time
+  '401':
+  description: Unauthorized - missing or invalid access token
+  '403':
+  description: Forbidden - user does not have the Tutor role
+  '422':
+  description: validation error - missing or invalid fields  
+
+
 
   /lessons/{id}:
     get:
