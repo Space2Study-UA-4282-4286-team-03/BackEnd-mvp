@@ -9,6 +9,7 @@ const Category = require('~/models/resourcesCategory')
 const {
   roles: { TUTOR }
 } = require('~/consts/auth')
+// const categoryNamesAggregateOptions = require('~/src/utils/categories/categoryNamesAggregateOptions')
 
 const endpointUrl = '/lessons/'
 
@@ -141,6 +142,78 @@ describe('Lessons controller', () => {
     it('should throw FORBIDDEN when user is not a tutor', async () => {
       const lessonId = new mongoose.Types.ObjectId()
       const response = await app.get(endpointUrl + lessonId).set('Cookie', [`accessToken=${studentAccessToken}`])
+
+      expectError(403, FORBIDDEN, response)
+    })
+  })
+
+  describe(`POST ${endpointUrl}`, () => {
+    it('Should create a lesson and return 201', async () => {
+      const category = await Category.create({
+        name: 'Science',
+        author: currentUser.id
+      })
+      const lessonData = {
+        title: 'new lesson',
+        files: ['file1.pdf'],
+        category: category._id.toString()
+      }
+      const response = await app
+        .post(endpointUrl)
+        .set('Cookie', [`accessToken=${accessToken}`])
+        .send(lessonData)
+
+      expect(response.statusCode).toBe(201)
+      expect(response.body).toHaveProperty('_id')
+      expect(response.body.title).toBe('new lesson')
+      expect(response.body.files).toEqual(['file1.pdf'])
+      expect(response.body.category).toHaveProperty('name', 'Science')
+      expect(response.body.author.toString()).toBe(currentUser.id)
+    })
+
+    it('Should create a lesson with only title (minimal data)', async () => {
+      const response = await app
+        .post(endpointUrl)
+        .set('Cookie', [`accessToken=${accessToken}`])
+        .send({ title: 'Minimal lesson' })
+
+      expect(response.statusCode).toBe(201)
+      expect(response.body.title).toBe('Minimal lesson')
+      expect(response.body.files).toEqual([])
+      expect(response.body.category).toBeNull()
+    })
+
+    it('Should return 422 when title is missing', async () => {
+      const response = await app
+        .post(endpointUrl)
+        .set('Cookie', [`accessToken=${accessToken}`])
+        .send({ files: ['file1.pdf'] })
+
+      expect(response.statusCode).toBe(422)
+      expect(response.body.code).toBe('FIELD_IS_NOT_DEFINED')
+    })
+
+    it('Should return 422 when title exceeds max length', async () => {
+      const response = await app
+        .post(endpointUrl)
+        .set('Cookie', [`accessToken=${accessToken}`])
+        .send({ title: 'A'.repeat(51) })
+
+      expect(response.statusCode).toBe(422)
+      expect(response.body.code).toBe('FIELD_IS_NOT_OF_PROPER_LENGTH')
+    })
+
+    it('Should throw UNAUTHORIZED when no token is provided', async () => {
+      const response = await app.post(endpointUrl).send({ title: 'test' })
+
+      expectError(401, UNAUTHORIZED, response)
+    })
+
+    it('Should throw FORBIDDEN when user is not a tutor', async () => {
+      const response = await app
+        .post(endpointUrl)
+        .set('Cookie', [`accessToken=${studentAccessToken}`])
+        .send({ title: 'test' })
 
       expectError(403, FORBIDDEN, response)
     })

@@ -33,7 +33,16 @@ const getLessonById = async (req, res) => {
   res.status(200).json(lesson)
 }
 
+const createLesson = async (req, res) => {
+  const { id: author } = req.user
+  const data = req.body
+
+  const newLesson = await lessonsService.createLesson(author, data)
+  res.status(201).json(newLesson)
+}
+
 module.exports = {
   getLessons,
-  getLessonById
+  getLessonById,
+  createLesson
 }

@@ -2,6 +2,7 @@ const { createUnauthorizedError, createForbiddenError } = require('~/utils/error
 const { tokenValidation } = require('../utils/tokenValidation')
 
 const authMiddleware = (req, _res, next) => {
+  req.headers = req.headers || {}
   let accessToken = null
 
   if (req.cookies && req.cookies.accessToken) {

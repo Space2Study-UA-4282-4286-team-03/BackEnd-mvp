@@ -119,4 +119,40 @@ describe('Lessons Service – integration', () => {
       expect(found).toBeNull()
     })
   })
+
+  describe('Create new lesson', () => {
+    it('Should create new lesson and return it with populated category', async () => {
+      const data = { title: 'new lesson', files: ['file.pdf'], category: category._id }
+
+      const result = await lessonsService.createLesson(authorId, data)
+
+      expect(result).toBeDefined()
+      expect(result.title).toBe('new lesson')
+      expect(result.files).toEqual(['file.pdf'])
+      expect(result.author.toString()).toBe(authorId.toString())
+      expect(result.category).toHaveProperty('name', 'Mathematics')
+    })
+
+    it('Should create new lesson without optional fields', async () => {
+      const data = { title: 'minimal lesson' }
+
+      const result = await lessonsService.createLesson(authorId, data)
+
+      expect(result).toBeDefined()
+      expect(result.title).toBe('minimal lesson')
+      expect(result.files).toEqual([])
+    })
+
+    it('Should throw validation error when title is missing', async () => {
+      const data = { files: ['file.pdf'] }
+
+      await expect(lessonsService.createLesson(authorId, data)).rejects.toThrow()
+    })
+
+    it('Should throw validation error when title exceeds max length', async () => {
+      const data = { title: 'A'.repeat(51) }
+
+      await expect(lessonsService.createLesson(authorId, data)).rejects.toThrow()
+    })
+  })
 })
