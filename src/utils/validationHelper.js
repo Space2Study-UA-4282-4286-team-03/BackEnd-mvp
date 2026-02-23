@@ -38,12 +38,19 @@ const validateEnum = (schemaFieldKey, enumSet, field) => {
   }
 }
 
+const validateIsArray = (schemaFieldKey, shouldBeArray, field) => {
+  if (shouldBeArray && !Array.isArray(field)) {
+    throw createError(422, FIELD_IS_NOT_OF_PROPER_TYPE(schemaFieldKey, 'array'))
+  }
+}
+
 const validateFunc = {
   required: validateRequired,
   type: validateType,
   length: validateLength,
   regex: validateRegex,
-  enum: validateEnum
+  enum: validateEnum,
+  isArray: validateIsArray
 }
 
 module.exports = {
