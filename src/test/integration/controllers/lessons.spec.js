@@ -9,7 +9,7 @@ const Category = require('~/models/resourcesCategory')
 const {
   roles: { TUTOR }
 } = require('~/consts/auth')
-// const categoryNamesAggregateOptions = require('~/src/utils/categories/categoryNamesAggregateOptions')
+require('dotenv').config({ path: '.env.test.local' })
 
 const endpointUrl = '/lessons/'
 
@@ -276,7 +276,7 @@ describe('Lessons controller', () => {
         firstName: 'Other',
         lastName: 'Tutor',
         email: 'othertutor@gmail.com',
-        password: 'pass1234',
+        password: process.env.TEST_USER_PASSWORD,
         appLanguage: 'en',
         isEmailConfirmed: true,
         lastLogin: new Date().toJSON(),
