@@ -41,8 +41,18 @@ const createLesson = async (req, res) => {
   res.status(201).json(newLesson)
 }
 
+const updateLesson = async (req, res) => {
+  const { id } = req.params
+  const { id: currentUserId } = req.user
+  const data = req.body
+
+  const updatedLesson = await lessonsService.updateLesson(id, currentUserId, data)
+  res.status(200).json(updatedLesson)
+}
+
 module.exports = {
   getLessons,
   getLessonById,
-  createLesson
+  createLesson,
+  updateLesson
 }

@@ -218,4 +218,116 @@ describe('Lessons controller', () => {
       expectError(403, FORBIDDEN, response)
     })
   })
+
+  describe(`PATCH ${endpointUrl}:id`, () => {
+    it('Should update a lesson and return 200', async () => {
+      const category = await Category.create({
+        name: 'Science',
+        author: currentUser.id
+      })
+
+      const lesson = await Lesson.create({
+        title: 'Old Title',
+        files: [],
+        category: category._id,
+        author: currentUser.id
+      })
+
+      const response = await app
+        .patch(endpointUrl + lesson._id)
+        .set('Cookie', [`accessToken=${accessToken}`])
+        .send({ title: 'Updated Title' })
+
+      expect(response.statusCode).toBe(200)
+      expect(response.body.title).toBe('Updated Title')
+      expect(response.body.category).toHaveProperty('name', 'Science')
+    })
+
+    it('Should update files and category', async () => {
+      const category = await Category.create({
+        name: 'Math',
+        author: currentUser.id
+      })
+      const newCategory = await Category.create({
+        name: 'Physics',
+        author: currentUser.id
+      })
+
+      const lesson = await Lesson.create({
+        title: 'Lesson',
+        files: ['old.pdf'],
+        category: category._id,
+        author: currentUser.id
+      })
+
+      const response = await app
+        .patch(endpointUrl + lesson._id)
+        .set('Cookie', [`accessToken=${accessToken}`])
+        .send({ files: ['new.pdf'], category: newCategory._id.toString() })
+
+      expect(response.statusCode).toBe(200)
+      expect(response.body.files).toEqual(['new.pdf'])
+      expect(response.body.category).toHaveProperty('name', 'Physics')
+    })
+
+    it('Should return 403 when user is not the lesson author', async () => {
+      const otherTutorToken = await testUserAuthentication(app, {
+        role: 'tutor',
+        firstName: 'Other',
+        lastName: 'Tutor',
+        email: 'othertutor@gmail.com',
+        password: 'pass1234',
+        appLanguage: 'en',
+        isEmailConfirmed: true,
+        lastLogin: new Date().toJSON(),
+        lastLoginAs: 'tutor'
+      })
+
+      const lesson = await Lesson.create({
+        title: 'My Lesson',
+        files: [],
+        author: currentUser.id
+      })
+
+      const response = await app
+        .patch(endpointUrl + lesson._id)
+        .set('Cookie', [`accessToken=${otherTutorToken}`])
+        .send({ title: 'Hacked' })
+
+      expectError(403, FORBIDDEN, response)
+    })
+
+    it('Should return 422 when title exceeds max length', async () => {
+      const lesson = await Lesson.create({
+        title: 'Valid',
+        files: [],
+        author: currentUser.id
+      })
+
+      const response = await app
+        .patch(endpointUrl + lesson._id)
+        .set('Cookie', [`accessToken=${accessToken}`])
+        .send({ title: 'A'.repeat(51) })
+
+      expect(response.statusCode).toBe(422)
+      expect(response.body.code).toBe('FIELD_IS_NOT_OF_PROPER_LENGTH')
+    })
+
+    it('Should throw UNAUTHORIZED when no token is provided', async () => {
+      const lessonId = new mongoose.Types.ObjectId()
+      const response = await app.patch(endpointUrl + lessonId).send({ title: 'test' })
+
+      expectError(401, UNAUTHORIZED, response)
+    })
+
+    it('Should throw FORBIDDEN when user is not a tutor', async () => {
+      const lessonId = new mongoose.Types.ObjectId()
+      const response = await app
+        .patch(endpointUrl + lessonId)
+        .set('Cookie', [`accessToken=${studentAccessToken}`])
+        .send({ title: 'test' })
+
+      expectError(403, FORBIDDEN, response)
+    })
+  })
 })
