@@ -218,7 +218,7 @@ paths:
             type: string
           description: The lesson ID
       requestBody:
-        required: true
+        required: false
         content:
           application/json:
             schema:
