@@ -155,6 +155,76 @@ describe('Lessons Service – integration', () => {
       await expect(lessonsService.createLesson(authorId, data)).rejects.toThrow()
     })
   })
+  describe('updateLesson', () => {
+    it('Should update lesson title', async () => {
+      const lesson = await Lesson.create({
+        title: 'Original',
+        files: ['file.pdf'],
+        category: category._id,
+        author: authorId
+      })
+
+      const result = await lessonsService.updateLesson(lesson._id, authorId.toString(), { title: 'Updated' })
+
+      expect(result.title).toBe('Updated')
+      expect(result.files).toEqual(['file.pdf'])
+      expect(result.category).toHaveProperty('name', 'Mathematics')
+    })
+
+    it('Should update files and category', async () => {
+      const newCategory = await Category.create({
+        name: 'Physics',
+        author: authorId
+      })
+
+      const lesson = await Lesson.create({
+        title: 'Lesson',
+        files: ['old.pdf'],
+        category: category._id,
+        author: authorId
+      })
+
+      const result = await lessonsService.updateLesson(lesson._id, authorId.toString(), {
+        files: ['new.pdf'],
+        category: newCategory._id
+      })
+
+      expect(result.files).toEqual(['new.pdf'])
+      expect(result.category).toHaveProperty('name', 'Physics')
+    })
+
+    it('Should ignore fields that are not in allowedFields', async () => {
+      const lesson = await Lesson.create({
+        title: 'Lesson',
+        files: [],
+        author: authorId
+      })
+
+      const result = await lessonsService.updateLesson(lesson._id, authorId.toString(), {
+        title: 'Updated',
+        author: anotherUserId
+      })
+
+      expect(result.title).toBe('Updated')
+      expect(result.author.toString()).toBe(authorId.toString())
+    })
+
+    it('Should throw NOT_FOUND for non-existent lesson', async () => {
+      const fakeId = new mongoose.Types.ObjectId()
+
+      await expect(lessonsService.updateLesson(fakeId, authorId.toString(), { title: 'Test' })).rejects.toThrow()
+    })
+
+    it('Should throw FORBIDDEN when user is not the author', async () => {
+      const lesson = await Lesson.create({
+        title: 'Lesson',
+        files: [],
+        author: authorId
+      })
+
+      await expect(
+        lessonsService.updateLesson(lesson._id, anotherUserId.toString(), { title: 'Hacked' })
+      ).rejects.toThrow()
 
   describe('Delete lesson', () => {
     it('should delete lesson by id', async () => {

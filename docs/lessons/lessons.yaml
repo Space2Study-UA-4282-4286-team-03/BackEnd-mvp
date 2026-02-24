@@ -204,7 +204,76 @@ paths:
           description: Forbidden – user does not have the Tutor role
         '404':
           description: Lesson not found
-
+     patch:
+      summary: Update a lesson by ID
+      tags:
+        - Lessons
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The lesson ID
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  minLength: 1
+                  maxLength: 50
+                  example: Updated Lesson Title
+                files:
+                  type: array
+                  items:
+                    type: string
+                  example: ['updated-notes.pdf']
+                category:
+                  type: string
+                  description: ObjectId of a ResourcesCategory
+                  example: 507f1f77bcf86cd799439013
+      responses:
+        '200':
+          description: Lesson updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  title:
+                    type: string
+                  author:
+                    type: string
+                  files:
+                    type: array
+                    items:
+                      type: string
+                  category:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                      name:
+                        type: string
+                  lastUpdated:
+                    type: string
+                    format: date-time
+        '401':
+          description: Unauthorized – missing or invalid access token
+        '403':
+          description: Forbidden – not authenticated, wrong role, or not the lesson author
+        '404':
+          description: Lesson not found
+        '422':
+          description: Validation error – invalid field values
     delete:
       summary: Delete a lesson by ID
       tags:
