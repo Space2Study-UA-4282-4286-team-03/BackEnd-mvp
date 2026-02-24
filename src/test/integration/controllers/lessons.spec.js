@@ -1,3 +1,4 @@
+require('dotenv').config({ path: '.env.test.local' })
 const mongoose = require('mongoose')
 const { serverInit, serverCleanup, stopServer } = require('~/test/setup')
 const { expectError } = require('~/test/helpers')
@@ -9,7 +10,6 @@ const Category = require('~/models/resourcesCategory')
 const {
   roles: { TUTOR }
 } = require('~/consts/auth')
-require('dotenv').config({ path: '.env.test.local' })
 
 const endpointUrl = '/lessons/'
 
@@ -218,8 +218,8 @@ describe('Lessons controller', () => {
       expectError(403, FORBIDDEN, response)
     })
   })
-  
-    describe(`PATCH ${endpointUrl}:id`, () => {
+
+  describe(`PATCH ${endpointUrl}:id`, () => {
     it('Should update a lesson and return 200', async () => {
       const category = await Category.create({
         name: 'Science',
@@ -328,6 +328,16 @@ describe('Lessons controller', () => {
         .send({ title: 'test' })
 
       expectError(403, FORBIDDEN, response)
+    })
+
+    it('Should return 404 when lesson does not exist', async () => {
+      const nonExistentId = new mongoose.Types.ObjectId()
+      const response = await app
+        .patch(endpointUrl + nonExistentId)
+        .set('Cookie', [`accessToken=${accessToken}`])
+        .send({ title: 'Ghost' })
+
+      expectError(404, DOCUMENT_NOT_FOUND(['Lesson']), response)
     })
   })
 
