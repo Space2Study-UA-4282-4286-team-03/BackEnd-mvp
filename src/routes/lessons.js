@@ -29,5 +29,6 @@ router.patch(
   validationMiddleWare(updateLessonValidationSchema),
   asyncWrapper(lessonsController.updateLesson)
 )
+router.delete('/:id', isEntityValid({ params }), asyncWrapper(lessonsController.deleteLessonById))
 
 module.exports = router

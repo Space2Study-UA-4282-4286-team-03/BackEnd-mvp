@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const { serverInit, serverCleanup, stopServer } = require('~/test/setup')
 const { expectError } = require('~/test/helpers')
-const { UNAUTHORIZED, FORBIDDEN } = require('~/consts/errors')
+const { UNAUTHORIZED, FORBIDDEN, DOCUMENT_NOT_FOUND } = require('~/consts/errors')
 const testUserAuthentication = require('~/utils/testUserAuth')
 const TokenService = require('~/services/token')
 const Lesson = require('~/models/lessons')
@@ -218,8 +218,8 @@ describe('Lessons controller', () => {
       expectError(403, FORBIDDEN, response)
     })
   })
-
-  describe(`PATCH ${endpointUrl}:id`, () => {
+  
+    describe(`PATCH ${endpointUrl}:id`, () => {
     it('Should update a lesson and return 200', async () => {
       const category = await Category.create({
         name: 'Science',
@@ -326,6 +326,64 @@ describe('Lessons controller', () => {
         .patch(endpointUrl + lessonId)
         .set('Cookie', [`accessToken=${studentAccessToken}`])
         .send({ title: 'test' })
+
+      expectError(403, FORBIDDEN, response)
+    })
+  })
+
+  describe(`DELETE ${endpointUrl}:id`, () => {
+    it('should delete a lesson and return 204', async () => {
+      const category = await Category.create({
+        name: 'Science',
+        author: currentUser.id
+      })
+      const lesson = await Lesson.create({
+        title: 'Lesson to delete',
+        files: [],
+        category: category._id,
+        author: currentUser.id
+      })
+
+      const response = await app.delete(endpointUrl + lesson._id).set('Cookie', [`accessToken=${accessToken}`])
+
+      expect(response.statusCode).toBe(204)
+      const found = await Lesson.findById(lesson._id)
+      expect(found).toBeNull()
+    })
+
+    it('should throw 404 when lesson does not exist', async () => {
+      const nonExistentId = new mongoose.Types.ObjectId()
+
+      const response = await app.delete(endpointUrl + nonExistentId).set('Cookie', [`accessToken=${accessToken}`])
+
+      expectError(404, DOCUMENT_NOT_FOUND(['Lesson']), response)
+    })
+
+    it('should throw FORBIDDEN when tutor is not the lesson author', async () => {
+      const anotherUserId = new mongoose.Types.ObjectId()
+      const lesson = await Lesson.create({
+        title: 'Not my lesson',
+        files: [],
+        author: anotherUserId
+      })
+
+      const response = await app.delete(endpointUrl + lesson._id).set('Cookie', [`accessToken=${accessToken}`])
+
+      expectError(403, FORBIDDEN, response)
+    })
+
+    it('should throw UNAUTHORIZED when no token is provided', async () => {
+      const lessonId = new mongoose.Types.ObjectId()
+
+      const response = await app.delete(endpointUrl + lessonId)
+
+      expectError(401, UNAUTHORIZED, response)
+    })
+
+    it('should throw FORBIDDEN when user is not a tutor', async () => {
+      const lessonId = new mongoose.Types.ObjectId()
+
+      const response = await app.delete(endpointUrl + lessonId).set('Cookie', [`accessToken=${studentAccessToken}`])
 
       expectError(403, FORBIDDEN, response)
     })

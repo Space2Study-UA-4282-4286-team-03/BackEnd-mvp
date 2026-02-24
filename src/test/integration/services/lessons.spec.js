@@ -225,6 +225,33 @@ describe('Lessons Service – integration', () => {
       await expect(
         lessonsService.updateLesson(lesson._id, anotherUserId.toString(), { title: 'Hacked' })
       ).rejects.toThrow()
+
+  describe('Delete lesson', () => {
+    it('should delete lesson by id', async () => {
+      const lesson = await Lesson.create({
+        title: 'To be deleted',
+        files: [],
+        category: category._id,
+        author: authorId
+      })
+      await lessonsService.deleteLesson(lesson._id, authorId)
+      const found = await Lesson.findById(lesson._id).exec()
+      expect(found).toBeNull()
+    })
+
+    it('should throw NOT_FOUND error when lesson does not exist', async () => {
+      const nonExistentId = new mongoose.Types.ObjectId()
+      await expect(lessonsService.deleteLesson(nonExistentId, authorId)).rejects.toMatchObject({ code: 'NOT_FOUND' })
+    })
+
+    it('should throw FORBIDDEN error when user is not the author', async () => {
+      const lesson = await Lesson.create({
+        title: 'Not my lesson',
+        files: [],
+        category: category._id,
+        author: anotherUserId
+      })
+      await expect(lessonsService.deleteLesson(lesson._id, authorId)).rejects.toMatchObject({ code: 'FORBIDDEN' })
     })
   })
 })
