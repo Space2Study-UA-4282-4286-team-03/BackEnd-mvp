@@ -1,0 +1,64 @@
+openapi: 3.0.0
+info:
+  title: Categories API
+  version: 1.0.0
+  description: API for managing categories
+
+components:
+  schemas:
+    CategoryAppearance:
+      type: object
+      required:
+        - icon
+        - color
+      properties:
+        icon:
+          type: string
+          description: >
+            Required. Path to the category icon.
+            Defaults to 'mocked-path-to-icon'.
+            Validation: "The appearance.icon field cannot be empty."
+          default: mocked-path-to-icon
+          example: mocked-path-to-icon
+        color:
+          type: string
+          description: >
+            Required. Color of the category icon in hex format.
+            Defaults to '#66C42C'.
+            Validation: "The appearance.color field cannot be empty."
+          default: '#66C42C'
+          example: '#66C42C'
+
+    Category:
+      type: object
+      required:
+        - name
+        - appearance
+      properties:
+        _id:
+          type: string
+          description: Unique identifier of the category
+          example: 64a1b2c3d4e5f6a7b8c9d0e1
+        name:
+          type: string
+          description: >
+            Required. Unique name of the category.
+            Validation messages:
+            - "The name field cannot be empty." (required)
+            - "Name cannot be shorter than 1 symbol." (minLength: 1)
+            - "Name cannot be longer than 30 symbol." (maxLength: 30)
+          minLength: 1
+          maxLength: 30
+          example: Mathematics
+        appearance:
+          $ref: '#/components/schemas/CategoryAppearance'
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the category was created
+          example: '2024-01-15T10:30:00.000Z'
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the category was last updated
+          example: '2024-01-15T10:30:00.000Z'
