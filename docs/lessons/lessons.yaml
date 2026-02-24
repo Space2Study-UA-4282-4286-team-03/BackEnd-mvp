@@ -204,7 +204,7 @@ paths:
           description: Forbidden – user does not have the Tutor role
         '404':
           description: Lesson not found
-     patch:
+    patch:
       summary: Update a lesson by ID
       tags:
         - Lessons
