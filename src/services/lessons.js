@@ -67,7 +67,7 @@ const lessonsService = {
 
     const author = lesson.author.toString()
 
-    if (author !== currentUserId) {
+    if (author !== currentUserId.toString()) {
       throw createForbiddenError()
     }
 

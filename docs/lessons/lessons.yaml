@@ -204,3 +204,26 @@ paths:
           description: Forbidden – user does not have the Tutor role
         '404':
           description: Lesson not found
+
+    delete:
+      summary: Delete a lesson by ID
+      tags:
+        - Lessons
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The lesson ID
+      responses:
+        '204':
+          description: Lesson deleted successfully
+        '401':
+          description: Unauthorized – missing or invalid access token
+        '403':
+          description: Forbidden – user does not have the Tutor role or is not the lesson author
+        '404':
+          description: Lesson not found

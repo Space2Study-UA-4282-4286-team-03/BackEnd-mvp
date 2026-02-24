@@ -22,5 +22,6 @@ const params = [{ model: Lesson, idName: 'id' }]
 router.get('/', asyncWrapper(lessonsController.getLessons))
 router.get('/:id', isEntityValid({ params }), asyncWrapper(lessonsController.getLessonById))
 router.post('/', validationMiddleWare(lessonValidationSchema), asyncWrapper(lessonsController.createLesson))
+router.delete('/:id', isEntityValid({ params }), asyncWrapper(lessonsController.deleteLessonById))
 
 module.exports = router
