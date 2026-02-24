@@ -225,6 +225,8 @@ describe('Lessons Service – integration', () => {
       await expect(
         lessonsService.updateLesson(lesson._id, anotherUserId.toString(), { title: 'Hacked' })
       ).rejects.toThrow()
+    })
+  })
 
   describe('Delete lesson', () => {
     it('should delete lesson by id', async () => {
