@@ -48,6 +48,7 @@ const updateLesson = async (req, res) => {
 
   const updatedLesson = await lessonsService.updateLesson(id, currentUserId, data)
   res.status(200).json(updatedLesson)
+}
 const deleteLessonById = async (req, res) => {
   const { id } = req.params
   const { id: currentUserId } = req.user
@@ -59,6 +60,6 @@ module.exports = {
   getLessons,
   getLessonById,
   createLesson,
-  updateLesson
+  updateLesson,
   deleteLessonById
 }
